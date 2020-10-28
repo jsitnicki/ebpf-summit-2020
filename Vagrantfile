@@ -24,4 +24,7 @@ Vagrant.configure("2") do |config|
     # Reboot into new kernel
     reboot
   SHELL
+
+  config.vm.synced_folder ".", "/vagrant", type: "rsync",
+    rsync__exclude: [".git/", ".vagrant/", "talk/"]
 end
