@@ -26,14 +26,18 @@ int main(int argc, char **argv)
 	const char *map_path;
 	union bpf_attr attr;
 
-	if (argc != 4) {
-		fprintf(stderr, "Usage: %s <target pid> <target fd> <map path>\n", argv[0]);
+	if (argc < 4) {
+		fprintf(stderr, "Usage: %s <target pid> <target fd> <map path> [map key]\n", argv[0]);
 		exit(EXIT_SUCCESS);
 	}
 
 	target_pid = atoi(argv[1]);
 	target_fd = atoi(argv[2]);
 	map_path = argv[3];
+	key = 0;
+
+	if (argc == 5)
+		key = atoi(argv[4]);
 
 	/* Get duplicate FD for the socket */
 	pid_fd = pidfd_open(target_pid, 0);
@@ -55,7 +59,6 @@ int main(int argc, char **argv)
 		error(EXIT_FAILURE, errno, "bpf(OBJ_GET)");
 
 	/* Insert socket FD into the BPF map */
-	key = 0;
 	value = (uint64_t) sock_fd;
 	memset(&attr, 0, sizeof(attr));
 	attr.map_fd = map_fd;
